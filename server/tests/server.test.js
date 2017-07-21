@@ -1,15 +1,19 @@
 const expect = require('expect');
 const request = require('supertest');
+const {ObjectID} = require('mongodb');
 
 const {app} = require('./../server');
 const {Todo} = require('./../model/todo');
 const {User} = require('./../model/user');
 
 const todos = [{
+    "_id": new ObjectID(),
     "text" : "This is first todo123"
 }, {
+    "_id": new ObjectID(),
     "text" : "This is second todo456"
 }, {
+    "_id": new ObjectID(),
     "text" : "This is third todo789"
 }];
 
@@ -90,4 +94,37 @@ describe("GET /todos", () => {
             });
         });
     });
+});
+
+describe("GET /todos/:id", () => {
+    it("It should return a todo by id", (done) => {
+        request(app)
+        .get(`/todos/${todos[0]._id.toHexString()}`)
+        .expect(200)
+        .expect((res) => {
+            expect(res.body.todo.text).toBe(todos[0].text)
+        })
+        .end(done);
+    });
+
+    it("It should return a 404 for invalid id of todo by id", (done) => {
+        request(app)
+        .get(`/todos/${new ObjectID().toHexString()}`)
+        .expect(404)
+        .expect((res) => {
+            //expect(res.body).toBe({});
+        })
+        .end(done);
+    });
+
+    it("It should return a 404 for non-object ids", (done) => {
+        request(app)
+        .get(`/todos/123`)
+        .expect(404)
+        .expect((res) => {
+            //expect(res.body).toBe({});
+        })
+        .end(done);
+    });
+
 });
