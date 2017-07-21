@@ -14,10 +14,10 @@ app.post('/todos', (req, res, next) => {
         text: req.body.text
     });
     todo.save().then((doc) => {
-        console.log("Todo saved successfully:",doc);
+        // console.log("Todo saved successfully:",doc);
         res.json(doc);
     }).catch((err) => {
-        console.log("Unable to save todo:",err);
+        // console.log("Unable to save todo:",err);
         res.status(400).send(err);
     });
 });
