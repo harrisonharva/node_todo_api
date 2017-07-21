@@ -49,14 +49,13 @@ app.get('/todos/:id', (req, res) => {
         //console.log(JSON.stringify(todo, undefined, 4));
         res.send({todo});
     }).catch((err) => {
-        //console.log(err);
         // res.status(400).send(err);
         res.status(400).send();
     });
 });
 
 app.listen(port,() => {
-    console.log('Server started on port : ', port);
+    console.log(`Server started on port : ${port}`);
 });
 
 module.exports = {app}
