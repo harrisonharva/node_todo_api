@@ -1,7 +1,7 @@
 const expect = require('expect');
 const request = require('supertest');
 
-const {app} = require('./../../server');
+const {app} = require('./../server');
 const {Todo} = require('./../model/todo');
 const {User} = require('./../model/user');
 
@@ -48,7 +48,6 @@ describe('POST /todos', () => {
             if(err) {
                 return done(err);
             }
-
             Todo.find().then((todos) => {
                 expect(todos.length).toBe(0);
                 //expect(todos[0].text).toBe(undefined);
