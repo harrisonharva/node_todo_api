@@ -6,6 +6,7 @@ const {app} = require('./../server');
 const {Todo} = require('./../model/todo');
 const {User} = require('./../model/user');
 
+// Initial test data of todos
 const todos = [{
     "_id": new ObjectID(),
     "text" : "This is first todo123"
@@ -17,13 +18,19 @@ const todos = [{
     "text" : "This is third todo789"
 }];
 
+// Used to perform task before each test case run
 beforeEach((done) => {
     Todo.remove({}).then(() => {
         return Todo.insertMany(todos);
-        //done();
     }).then(() => done());
 });
 
+/**
+ * Test cases for POST /todos
+ * @param  {[type]} POST [description]
+ * @param  {[type]} it   [description]
+ * @return {[type]}      [description]
+ */
 describe('POST /todos', () => {
     it('It should creat a new todo', (done) => {
         var text = "Test todo text";
@@ -149,7 +156,6 @@ describe("DELETE /todos/:id", () => {
                 done(err);
             });
         });
-        // .end(done);
     });
 
     it("It should return a 404 for if todo id not found", (done) => {
