@@ -1,6 +1,9 @@
-var mongoose = require('mongoose');
+const mongoose = require('mongoose');
+const validator = require('validator');
+const jwt = require('jsonwebtoken');
+const _ = require('lodash');
 
-var User = mongoose.model('User', {
+var UserSchema = new mongoose.Schema({
     name: {
         type: String,
         required: true,
@@ -12,8 +15,27 @@ var User = mongoose.model('User', {
         required: true,
         minlength: 3,
         trim: true,
-        // validate: [ email, 'Invalid email' ]
+        unique : true,
+        validate: {
+            validator: validator.isEmail,
+            message: '{VALUE} is not a valid email'
+        }
     },
+    password: {
+        type: String,
+        required: true,
+        minlength: 6,
+    },
+    tokens: [{
+        access: {
+            type: String,
+            required: true
+        },
+        token: {
+            type: String,
+            required: true
+        }
+    }],
     age: {
         type: Number,
         required: 'Age is required',
@@ -30,5 +52,35 @@ var User = mongoose.model('User', {
         expires: 60*60*24
     }
 });
+
+/**
+ * Used to override object.json data to send custom data from user object instead of all user's information
+ * @return {object} [user object with minimal user data]
+ */
+UserSchema.methods.toJSON = function(){
+    var user = this;
+    var userObject = user.toObject();
+    return _.pick(userObject, ['_id', 'email']);
+};
+
+/**
+ * [Method is useful to generate user auth token for user authentication]
+ * @return {[string]} [Returns token String which is user auth token]
+ */
+UserSchema.methods.generateAuthToken = function(){
+    var user = this;
+    var access = 'auth';
+    var token = jwt.sign({_id: user._id.toHexString(), access}, 'testSecretKey').toString();
+    user.tokens.push({access, token});
+    return user.save().then((savedUserData) => {
+        //  console.log("User saved successfully -> token:"+JSON.stringify(token, undefined, 4));
+        //  console.log("User saved successfully -> savedUserData:"+JSON.stringify(savedUserData, undefined, 4));
+        return token;
+    }, (err) => {
+        console.log('Unable to store userAuthToken:'+JSON.stringify(err, undefined, 4));
+    });
+};
+
+var User = mongoose.model('User', UserSchema);
 
 module.exports = {User};

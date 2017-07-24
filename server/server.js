@@ -117,6 +117,30 @@ app.patch('/todos/:id', (req, res) => {
     });
 });
 
+/**
+ * POST /users
+ * Save user data
+ * @object {User}
+ */
+app.post('/users', (req, res, next) => {
+    var body = _.pick(req.body, ['name', 'email', 'password', 'age', 'location'])
+    var user = new User(body);
+    user.save().then((savedUser) => {
+        // User saved successfully
+        return user.generateAuthToken();
+    }).then((token) => {
+        // res.header("Access-Control-Allow-Origin", "*");
+        // res.header("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT, DELETE");
+        // res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+        res.header("x-auth", token);
+        res.send(user);
+    }).catch((err) => {
+        // Unable to save user
+        console.log("From Catch block for error"+JSON.stringify(err, undefined, 4));
+        res.status(400).send(err);
+    });
+});
+
 app.listen(port,() => {
     console.log(`Server started on port : ${port}`);
 });
