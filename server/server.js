@@ -7,13 +7,14 @@ const {ObjectID} = require('mongodb');
 var {mongoose} = require('./db/mongoose');
 var {Todo} = require('./model/todo');
 var {User} = require('./model/user');
+var {authenticate} = require('./middleware/authenticate');
 const port = process.env.PORT || 3000;
 
 var app = express();
 app.use(bodyParser.json());
 
 /**
- * POST /todo
+ * Save todo route as a POST /todo
  * Save todo data
  * @object {Todo}
  */
@@ -31,7 +32,7 @@ app.post('/todos', (req, res, next) => {
 });
 
 /**
- * GET /todos
+ * Fetch all todos route as a GET /todos
  * Get all todos
  * @type {[type]}
  */
@@ -50,7 +51,7 @@ app.get('/todos', (req, res) => {
 
 //
 /**
- * GET /todos/123456
+ * Fetch individual todo route by todo id as a GET /todos/123456
  * Get todo by id
  * @type {[type]}
  */
@@ -71,7 +72,7 @@ app.get('/todos/:id', (req, res) => {
 });
 
 /**
- * DELETE /todos/:id
+ * Remove todos route as a DELETE /todos/:id
  * Delete todo by id
  * @type {[type]}
  */
@@ -91,7 +92,7 @@ app.delete('/todos/:id', (req, res) => {
 });
 
 /**
- * PATCH /todos/:id
+ * Update todos route as a PATCH /todos/:id
  * Update todo by id
  * @type {[type]}
  */
@@ -118,7 +119,7 @@ app.patch('/todos/:id', (req, res) => {
 });
 
 /**
- * POST /users
+ * User signup route as a POST /users
  * Save user data
  * @object {User}
  */
@@ -132,6 +133,10 @@ app.post('/users', (req, res, next) => {
         // res.header("Access-Control-Allow-Origin", "*");
         // res.header("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT, DELETE");
         // res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+        console.log('************************************');
+        console.log('UserToken :');
+        console.log(token);
+        console.log('************************************');
         res.header("x-auth", token);
         res.send(user);
     }).catch((err) => {
@@ -139,6 +144,10 @@ app.post('/users', (req, res, next) => {
         console.log("From Catch block for error"+JSON.stringify(err, undefined, 4));
         res.status(400).send(err);
     });
+});
+
+app.get('/users/me', authenticate, (req, res, next) => {
+    res.send(req.user);
 });
 
 app.listen(port,() => {

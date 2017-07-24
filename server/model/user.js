@@ -81,6 +81,25 @@ UserSchema.methods.generateAuthToken = function(){
     });
 };
 
+UserSchema.statics.findByToken = function(token){
+    var User = this;
+    var decoded;
+
+    try {
+        decoded = jwt.verify(token, 'testSecretKey');
+        console.log("Decoded token:"+JSON.stringify(decoded, undefined, 4));
+    } catch(e) {
+        console.log("Error: Token unhashing issue:"+e);
+        return Promise.reject();
+    }
+    var userdata = User.findOne({
+        '_id': decoded._id,
+        'tokens.token': token,
+        'tokens.access': 'auth'
+    });
+    return userdata;
+};
+
 var User = mongoose.model('User', UserSchema);
 
 module.exports = {User};
