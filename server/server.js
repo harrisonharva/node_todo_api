@@ -146,10 +146,18 @@ app.post('/users', (req, res, next) => {
     });
 });
 
+/**
+ * Used to get user token
+ * @type {[type]}
+ */
 app.get('/users/me', authenticate, (req, res, next) => {
     res.send(req.user);
 });
 
+/**
+ * Used to perform user login operation
+ * @type {[type]}
+ */
 app.post('/users/login', (req, res, next) => {
     var body = _.pick(req.body,['email', 'password']);
     User.findByCredentials(body.email, body.password).then((user) => {
@@ -157,6 +165,18 @@ app.post('/users/login', (req, res, next) => {
             res.header("x-auth", token).send(user);
         });
     }).catch((e) => {
+        res.status(400).send();
+    });
+});
+
+/**
+ * Used to perform user logout operation
+ * @type {[type]}
+ */
+app.delete('/users/me/token', authenticate, (req, res, next) => {
+    req.user.removeToken(req.token).then(() => {
+        res.status(200).send();
+    }, (err) => {
         res.status(400).send();
     });
 });
