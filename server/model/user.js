@@ -74,7 +74,7 @@ UserSchema.methods.generateAuthToken = function(){
     var token = jwt.sign({_id: user._id.toHexString(), access}, 'testSecretKey').toString();
     user.tokens.push({access, token});
     return user.save().then((savedUserData) => {
-        //  console.log("User saved successfully -> token:"+JSON.stringify(token, undefined, 4));
+        console.log("User saved successfully -> token:"+JSON.stringify(token, undefined, 4));
         //  console.log("User saved successfully -> savedUserData:"+JSON.stringify(savedUserData, undefined, 4));
         return token;
     }, (err) => {
@@ -116,6 +116,25 @@ UserSchema.pre('save', function(next) {
         next();
     }
 });
+
+UserSchema.statics.findByCredentials = function(email, password) {
+    var User = this;
+    return User.findOne({"email":email}).then((user) => {
+        if(!user) {
+            return Promise.reject();
+        }
+        return new Promise((resolve, reject) => {
+            // Compare hashed password from the database object and return data accordingly
+            bcrypt.compare(password, user.password, (error, result) => {
+                if(result == false) {
+                    reject();
+                } else {
+                    resolve(user);
+                }
+            });
+        });
+    });
+}
 
 var User = mongoose.model('User', UserSchema);
 
