@@ -74,8 +74,8 @@ UserSchema.methods.generateAuthToken = function(){
     var token = jwt.sign({_id: user._id.toHexString(), access}, 'testSecretKey').toString();
     user.tokens.push({access, token});
     return user.save().then((savedUserData) => {
-        console.log("User saved successfully -> token:"+JSON.stringify(token, undefined, 4));
-        //  console.log("User saved successfully -> savedUserData:"+JSON.stringify(savedUserData, undefined, 4));
+        // console.log("User saved successfully -> token:"+JSON.stringify(token, undefined, 4));
+        // console.log("User saved successfully -> savedUserData:"+JSON.stringify(savedUserData, undefined, 4));
         return token;
     }, (err) => {
         console.log('Unable to store userAuthToken:'+JSON.stringify(err, undefined, 4));
@@ -103,16 +103,22 @@ UserSchema.statics.findByToken = function(token){
 
 UserSchema.pre('save', function(next) {
     var user = this;
-    if(user.isModified('password')) {
-        bcrypt.genSalt(10, (err, salt) => {
-            // console.log('Generating and hashing user password to store in the database');
-            bcrypt.hash(user.password, salt, (err, hash) => {
-                user.password = hash;
-                // console.log('User hashed password:'+user.password);
-                next();
+    try {
+        if(user.isModified('password')) {
+            bcrypt.genSalt(10, (err, salt) => {
+                // console.log('Generating and hashing user password to store in the database');
+                bcrypt.hash(user.password, salt, (err, hash) => {
+                    user.password = hash;
+                    // console.log('User hashed password:'+user.password);
+                    next();
+                });
             });
-        });
-    } else {
+        } else {
+            console.log("From else block in the pre.save()");
+            next();
+        }
+    } catch(e) {
+        console.log("Error in processing password hashing:"+e);
         next();
     }
 });

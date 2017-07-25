@@ -159,6 +159,7 @@ describe("DELETE /todos/:id", () => {
         .end(done);
     });
 });
+
 describe("PATCH /todos/:id", () => {
     it("It should update a todo by id", (done) => {
         var hexId = todos[0]._id.toHexString();
@@ -233,6 +234,44 @@ describe('GET /users/me', () => {
     });
 });
 
+describe('POST /users/login', () => {
+    it("It should login user and return auth token", (done) => {
+        request(app)
+        .post("/users/login")
+        .send(users[2])
+        .expect(200)
+        .expect((res) => {
+            expect(res.headers['x-auth']).toExist();
+        })
+        .end((err, res) => {
+            if(err) {
+                return done(err);
+            }
+            User.findById(users[2]._id).then((user) => {
+                // expect(user.tokens[0]).toInclude({
+                //     access:'auth',
+                //     token:res.headers['x-auth']
+                // });
+                expect(user.tokens[0]).toBeA('object');
+                done();
+            }).catch((err) => done(err));
+        })
+    });
+
+    it("It should reject invalid login", (done) => {
+        var invalid_request_data = users[2];
+        invalid_request_data.password = invalid_request_data.password+"Invalid_password";
+        request(app)
+        .post("/users/login")
+        .send(invalid_request_data)
+        .expect(400)
+        .expect((res) => {
+            expect(res.headers['x-auth']).toNotExist();
+        })
+        .end((err, res) => done(err));
+    });
+});
+
 describe('POST /users', () => {
     it('It should create a user if everything is valid', (done) => {
         var email = "example@example.com";
@@ -261,7 +300,7 @@ describe('POST /users', () => {
                 expect(user).toExist();
                 expect(user.password).toNotBe(password);
                 done();
-            });
+            }).catch((err) => done(err));
         });
     });
 
@@ -303,7 +342,6 @@ describe('POST /users', () => {
         .expect(400)
         .expect((res) => {
             expect(res.headers['x-auth']).toNotExist();
-            expect(res.body._id).toNotExist();
             expect(res.body._id).toNotExist();
         })
         .end(done());
