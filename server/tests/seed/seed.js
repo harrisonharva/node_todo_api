@@ -3,24 +3,6 @@ const {Todo} = require('./../../model/todo');
 const {User} = require('./../../model/user');
 const jwt = require('jsonwebtoken');
 
-// Initial test data of todos
-const todos = [{
-    "_id": new ObjectID(),
-    "text" : "This is first todo123",
-    "completed": true,
-    "completedAt": 333
-}, {
-    "_id": new ObjectID(),
-    "text" : "This is second todo456",
-    "completed": false,
-    "completedAt": 444
-}, {
-    "_id": new ObjectID(),
-    "text" : "This is third todo789",
-    "completed": true,
-    "completedAt": 555
-}];
-
 // Initial test data of users
 const userOneId = new ObjectID();
 const userTwoId = new ObjectID();
@@ -64,6 +46,27 @@ const users = [{
     }]
 }
 ];
+
+// Initial test data of todos
+const todos = [{
+    "_id": new ObjectID(),
+    "text" : "This is first todo123",
+    "completed": true,
+    "completedAt": 333,
+    "_creator_id": userOneId
+}, {
+    "_id": new ObjectID(),
+    "text" : "This is second todo456",
+    "completed": false,
+    "completedAt": 444,
+    "_creator_id": userTwoId
+}, {
+    "_id": new ObjectID(),
+    "text" : "This is third todo789",
+    "completed": true,
+    "completedAt": 555,
+    "_creator_id": userThreeId
+}];
 
 // Used to perform task before each test case run
 const populateTodos = (done) => {
