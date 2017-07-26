@@ -121,7 +121,7 @@ app.patch('/todos/:id', authenticate, (req, res) => {
         {
             _id: id,
             _creator_id : req.user._id
-        }, 
+        },
         {$set:body},
         {new: true}
     ).then((todo) => {
@@ -157,7 +157,7 @@ app.post('/users', (req, res, next) => {
         res.send(user);
     }).catch((err) => {
         // Unable to save user
-        console.log("From Catch block for error"+JSON.stringify(err, undefined, 4));
+        // console.log("From Catch block for error"+JSON.stringify(err, undefined, 4));
         res.status(400).send(err);
     });
 });

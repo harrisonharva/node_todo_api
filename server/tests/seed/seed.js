@@ -16,7 +16,7 @@ const users = [{
     "location":"testLocation1",
     "tokens": [{
         "access": 'auth',
-        "token": jwt.sign({_id: userOneId, access: 'auth'}, 'testSecretKey').toString()
+        "token": jwt.sign({_id: userOneId, access: 'auth'}, process.env.JWT_SECRET_KEY).toString()
     }]
 },
 {
@@ -28,7 +28,7 @@ const users = [{
     "location":"testLocation2",
     "tokens": [{
         "access": 'auth',
-        "token": jwt.sign({_id: userTwoId, access: 'auth'}, 'testSecretKey').toString()
+        "token": jwt.sign({_id: userTwoId, access: 'auth'}, process.env.JWT_SECRET_KEY).toString()
 
     }]
 },
@@ -41,7 +41,7 @@ const users = [{
     "location":"testLocation3",
     "tokens": [{
         "access": 'auth',
-        "token": jwt.sign({_id: userThreeId, access: 'auth'}, 'testSecretKey').toString()
+        "token": jwt.sign({_id: userThreeId, access: 'auth'}, process.env.JWT_SECRET_KEY).toString()
 
     }]
 }

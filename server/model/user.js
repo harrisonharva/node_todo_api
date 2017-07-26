@@ -71,14 +71,14 @@ UserSchema.methods.toJSON = function(){
 UserSchema.methods.generateAuthToken = function(){
     var user = this;
     var access = 'auth';
-    var token = jwt.sign({_id: user._id.toHexString(), access}, 'testSecretKey').toString();
+    var token = jwt.sign({_id: user._id.toHexString(), access}, process.env.JWT_SECRET_KEY).toString();
     user.tokens.push({access, token});
     return user.save().then((savedUserData) => {
         // console.log("User saved successfully -> token:"+JSON.stringify(token, undefined, 4));
         // console.log("User saved successfully -> savedUserData:"+JSON.stringify(savedUserData, undefined, 4));
         return token;
     }, (err) => {
-        console.log('Unable to store userAuthToken:'+JSON.stringify(err, undefined, 4));
+        // console.log('Unable to store userAuthToken:'+JSON.stringify(err, undefined, 4));
     });
 };
 
@@ -87,10 +87,10 @@ UserSchema.statics.findByToken = function(token){
     var decoded;
 
     try {
-        decoded = jwt.verify(token, 'testSecretKey');
-        console.log("Decoded token:"+JSON.stringify(decoded, undefined, 4));
+        decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
+        //console.log("Decoded token:"+JSON.stringify(decoded, undefined, 4));
     } catch(e) {
-        console.log("Error: Token unhashing issue:"+e);
+        //console.log("Error: Token unhashing issue:"+e);
         return Promise.reject();
     }
     var userdata = User.findOne({
@@ -114,11 +114,10 @@ UserSchema.pre('save', function(next) {
                 });
             });
         } else {
-            console.log("From else block in the pre.save()");
             next();
         }
     } catch(e) {
-        console.log("Error in processing password hashing:"+e);
+        // console.log("Error in processing password hashing:"+e);
         next();
     }
 });
